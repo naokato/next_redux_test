@@ -1,11 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { counterSlice, CounterState, store } from "../store";
+import { counterSlice, CounterState, store } from "../store/counter/slice";
 import { NextPage } from "next";
+import { persistor } from '../store'
 
 const Home: NextPage = () => {
   const dispatch = useDispatch();
   const counterSelector = useSelector((state: RootState) => state.counter);
-  const { INCREMENT, DECREMENT, HELLO } = counterSlice.actions;
+  const { INCREMENT, DECREMENT, RESET, HELLO } = counterSlice.actions;
 
   return (
     <div>
@@ -26,6 +27,22 @@ const Home: NextPage = () => {
         Decliment
       </button>
       
+      <button
+        onClick={() => {
+          dispatch(RESET())
+        }}
+      >
+        Reset
+      </button>
+
+      <button
+        onClick={() => {
+          persistor.purge()
+        }}
+      >
+        Purge
+      </button>
+
       <button
         onClick={() => {
           dispatch(HELLO());

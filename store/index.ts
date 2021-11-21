@@ -1,46 +1,30 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers } from "redux"; 
+import { persistReducer, persistStore } from 'redux-persist'
+import storage from 'redux-persist/lib/storage'
+import { CounterState, counterSlice } from './counter/slice'
 
-// typeの定義
-export type CounterState = {
-  value: number;
-};
 export type RootState = {
   counter: CounterState
 };
 
-// 初期値の定義
-const initialState: CounterState = { value: 0 };
+// redux-persist 用設定
+const persistConfig = {
+  key: 'root',
+  storage,
+  whitelist: ['counter']
+};
 
-export const counterSlice = createSlice({
-  // 名前
-  name: "COUNTER",
-
-  // 初期値
-  initialState,
-
-  // reducer
-  reducers: {
-    INCREMENT(state) {
-      state.value++;
-    },
-    DECREMENT(state) {
-      state.value--;
-    },
-    HELLO: {
-      reducer: (state, action) => {
-        return {...state, result: action}
-      },
-      prepare: () => {
-        return {
-          payload: 'hello!'
-        }
-      }
-    }
-  },
+// configureStore を使う場合は、combineReducers は通常必要無いが、
+// persistedReducer, persistStore を利用するのに必要となる
+const reducers = combineReducers({
+  counter: counterSlice.reducer,
 });
+
+const persistedReducer = persistReducer(persistConfig, reducers);
 
 export const store = configureStore({
-  reducer: {
-    counter: counterSlice.reducer,
-  },
+  reducer: persistedReducer,
 });
+
+export const persistor = persistStore(store);
